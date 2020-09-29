@@ -1,0 +1,34 @@
+﻿/ Look for char in cad
+/ by fmartine
+/ Copyright (C) 2019.
+
+Jump begin	/reserve a space for data
+
+tmpptr, DEC 0	/base pointer
+ptr, DEC 5		/pointer... must know in advance the memory address for cad
+one, DEC 1		/offset
+char, HEX 33	/char of interest
+cad, HEX 30		/start storing cad characters
+	HEX 31
+	HEX 32
+	HEX 33
+	HEX 34
+
+begin, load ptr			/keep safe the base pointer
+	store tmpptr		
+start, LoadI ptr		/indirect access to firs character of cad
+		Subt char		
+        Skipcond 400	/there was the char of interest
+        Jump Uptr		/No, then update pointer
+        Jump getPosition	/yes calculate match position
+
+Uptr, Load ptr			/update pointer
+	add one
+    Store ptr
+    Jump start
+
+getPosition, Load ptr	/get position
+	Subt tmpptr
+	Output
+        
+Halt
