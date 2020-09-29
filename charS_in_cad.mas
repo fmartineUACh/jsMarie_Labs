@@ -1,0 +1,59 @@
+﻿/ Look for occurrences of chars in cad
+/ by fmartine
+/ Copyright (C) 2020.
+
+Jump begin	/reserve a space for data
+
+tmpptr, DEC 0	/base pointer
+ptr, DEC 5		/pointer... must know in advance the memory address for cad
+one, DEC 1		/offset
+char, HEX 33	/char of interest
+cad, HEX 30		/chars in memory cells
+	HEX 33
+	HEX 32
+	HEX 33
+	HEX 34
+    HEX 00
+c_Chars, DEC 0	/var to record number of occurrences
+ptrPoss, HEX D	/pointer to position of occurrences
+tmpPoss, DEC 0	/mem space to store positions
+		DEC 0
+        DEC 0
+optrPoss, HEX 0   /aux pointer
+
+begin, load ptr			/keep safe the base pointers
+	store tmpptr		
+    Load ptrPoss
+	store optrPoss
+
+start, LoadI ptr		/indirect access to firs character of cad
+		Subt char		
+        Skipcond 400	/there was the char of interest
+        Jump Uptr		/No, update pointer        
+Ucnt, Load c_Chars 		/update counter
+		Add one
+    	Store c_Chars
+        Load ptr
+        Subt tmpptr
+		StoreI ptrPoss	/keep track of ptr when a match occurs
+		Load ptrPoss
+		Add one
+		Store ptrPoss
+
+Uptr,  Load ptr			/update pointer
+	add one
+    Store ptr
+    LoadI ptr			
+    Skipcond 400		/end of cad?
+    Jump start
+
+getPosition, Load c_Chars	/show number of occurrences
+	Output
+iPoss,	LoadI optrPoss		/show index of occurrences
+	Skipcond 800            
+end, Halt
+	Output
+    Load optrPoss
+	Add one
+	Store optrPoss
+	Jump iPoss
