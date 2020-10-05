@@ -1,0 +1,59 @@
+﻿/ Look for char in cad
+/ by fmartine
+/ Copyright (C) 2019.
+
+Jump begin	/reserve a space for data
+
+tmpptr1, DEC 7	/reset values for pointers
+tmpptr2, DEC 8	
+ptr1, DEC 7		/pointer... must know in advance the memory address for cad
+ptr2, DEC 8		/pointer 2 is a position ahead of ptr1
+one, DEC 1		/offset
+auxchar, HEX 0	/char aux
+cad, HEX 63		/ c
+	HEX 61		/ a
+	HEX 64		/ n
+	HEX 65		/ e
+	HEX 6E		/ d
+eoc, HEX 0		/ end of cad    
+
+begin, loadi ptr2			/load char to test for eoc
+	Store auxchar			/char to be compared
+	Skipcond 400			/ end of cad
+	Jump test_char			/ work out char comparison		
+    Jump test_oec			/ double check if eoc
+    
+test_char, LoadI ptr1		/ load ptr1 char
+	subt	auxchar
+    Skipcond 000			/ test if [ptr1] < [ptr2]
+    Jump inc_ptrs		/ move both pointers
+
+mov_ptr2,    Load ptr2				/ 
+    Add one					/ continue moving ptr2
+    Store ptr2				/ update ptr2 value
+    Jump begin				/ back to loop
+
+inc_ptrs, Load ptr1
+	Add one					/ move ptr1
+    Store ptr1				/ update ptr1 value
+    LoadI ptr1 				/ load [ptr1]
+    Skipcond 400			/ if eoc finish
+    Jump mov_ptr2			/ now go to move ptr2
+    
+test_oec, Subt one			/ a position backwards
+		Subt ptr1			/ is ptr1 behind ptr2
+        Skipcond 800		/ 
+        Jump finish			/ no more chars to be sorted up
+		
+        LoadI ptr1
+		output				/ display character
+        Load one
+        StoreI ptr1			/ label memory cell
+        
+        Load tmpptr1		/ reset pointers values
+		Store ptr1			
+        Load tmpptr2
+		Store ptr2
+        Jump begin
+
+finish, Halt
